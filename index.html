@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Sets character encoding -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes the page responsive -->
+    <title>To-Do List</title>
+    <style>
+        /* General page styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        /* Container for the to-do list */
+        .container {
+            width: 500px;
+            height: 500px;
+            max-width: 400px;
+            background: rgb(222, 186, 217);
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        h1 {
+            text-align: center;
+            color: rgb(8, 12, 137);
+            font-size: 28px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: rgb(8, 12, 137);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #fff;
+            margin-top: 5px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .completed {
+            text-decoration: line-through;
+            color: grey;
+        }
+        .btn-edit, .btn-delete {
+            margin-left: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn-delete {
+            color: red;
+        }
+        .btn-edit {
+            color: blue;
+        }
+        /* Responsive design for smaller screens */
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <input type="text" id="taskInput" placeholder="Enter a task">
+        <button onclick="addTask()">Add</button>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadTasks); // Load saved tasks on page load
+
+        function addTask() {
+            let taskInput = document.getElementById("taskInput");
+            let taskText = taskInput.value.trim();
+            
+            if (taskText === "") {
+                alert("Task cannot be empty!"); // Prevents empty tasks
+                return;
+            }
+            
+            let taskList = document.getElementById("taskList");
+            let li = document.createElement("li");
+            
+            // Creates task item with checkbox, text, edit, and delete buttons
+            li.innerHTML = `
+                <input type="checkbox" onclick="toggleComplete(this)"> 
+                <span>${taskText}</span> 
+                <button class="btn-edit" onclick="editTask(this)">Edit</button> 
+                <button class="btn-delete" onclick="deleteTask(this)">Delete</button>
+            `;
+            
+            taskList.appendChild(li);
+            taskInput.value = "";
+            saveTasks(); // Save updated task list
+        }
+
+        function toggleComplete(checkbox) {
+            checkbox.nextElementSibling.classList.toggle("completed"); // Toggles strike-through style
+            saveTasks();
+        }
+
+        function editTask(button) {
+            let taskSpan = button.previousElementSibling;
+            let newText = prompt("Edit task:", taskSpan.innerText); // Prompt user for new text
+            
+            if (newText !== null && newText.trim() !== "") {
+                taskSpan.innerText = newText;
+                saveTasks();
+            }
+        }
+
+        function deleteTask(button) {
+            button.parentElement.remove(); // Removes the task from the list
+            saveTasks();
+        }
+
+        function saveTasks() {
+            let tasks = [];
+            document.querySelectorAll("#taskList li").forEach(li => {
+                tasks.push({
+                    text: li.children[1].innerText, // Stores task text
+                    completed: li.children[0].checked // Stores completion status
+                });
+            });
+            localStorage.setItem("tasks", JSON.stringify(tasks)); // Saves tasks in local storage
+        }
+
+        function loadTasks() {
+            let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            let taskList = document.getElementById("taskList");
+            
+            tasks.forEach(task => {
+                let li = document.createElement("li");
+                li.innerHTML = `
+                    <input type="checkbox" ${task.completed ? "checked" : ""} onclick="toggleComplete(this)"> 
+                    <span class="${task.completed ? "completed" : ""}">${task.text}</span> 
+                    <button class="btn-edit" onclick="editTask(this)">Edit</button> 
+                    <button class="btn-delete" onclick="deleteTask(this)">Delete</button>
+                `;
+                taskList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
