@@ -7,6 +7,6 @@ It allows users to add, edit, mark as completed, and delete tasks.
 -  Add new tasks  
 -  Mark tasks as complete  
 -  Delete tasks  
--  Edit existing tasks (if applicable)  
+-  Edit existing tasks  
 -  Simple and clean UI  
 
